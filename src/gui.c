@@ -4,6 +4,7 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <psp2kern/kernel/sysmem/memtype.h>
 
 #include "main.h"
 #include "gui.h"

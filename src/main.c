@@ -13,9 +13,9 @@
 int module_get_offset(SceUID pid, SceUID modid, int segidx, size_t offset, uintptr_t *addr);
 int module_get_export_func(SceUID pid, const char *modname, uint32_t libnid, uint32_t funcnid, uintptr_t *func);
 bool ksceAppMgrIsExclusiveProcessRunning();
-bool ksceSblAimgrIsGenuineDolce();
-bool ksceSblACMgrIsPspEmu(SceUID pid);
-bool ksceSblACMgrIsSceShell(SceUID pid);
+//bool ksceSblAimgrIsGenuineDolce();
+//bool ksceSblACMgrIsPspEmu(SceUID pid);
+//bool ksceSblACMgrIsSceShell(SceUID pid);
 
 #define PSVS_MAX_HOOKS 18
 static tai_hook_ref_t g_hookrefs[PSVS_MAX_HOOKS];
