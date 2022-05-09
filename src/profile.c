@@ -8,6 +8,13 @@
 #include "oc.h"
 
 #define PSVS_PROFILES_DIR "ur0:data/PSVshell_fork/profiles/"
+#define PSVS_COMPAT_PROFILES_DIR "ur0:data/PSVshell/profiles/"
+
+typedef struct {
+    char ver[8];
+    psvs_oc_mode_t mode[PSVS_OC_DEVICE_VENEZIA];
+    int manual_freq[PSVS_OC_DEVICE_VENEZIA];
+} psvs_oc_compat_profile_t;
 
 static bool g_profile_exists = false;
 static bool g_profile_exists_global = false;
@@ -18,7 +25,57 @@ void psvs_profile_init() {
     ksceIoMkdir(PSVS_PROFILES_DIR, 0777);
 }
 
-bool psvs_profile_load() {
+bool psvs_profile_load_compat() {
+    g_profile_exists = false;
+    g_profile_exists_global = false;
+
+    SceUID fd = -1;
+    char path[128];
+    snprintf(path, 128, "%s%s", PSVS_COMPAT_PROFILES_DIR, g_titleid);
+
+    // always check both so we can tell if both of them exist
+    SceUID fd_title = ksceIoOpen(path, SCE_O_RDONLY, 0777);
+    SceUID fd_global = ksceIoOpen(PSVS_COMPAT_PROFILES_DIR "global", SCE_O_RDONLY, 0777);
+    if (fd_title < 0 && fd_global < 0)
+        return false;
+
+    // default to global profile
+    if (fd_global >= 0) {
+        fd = fd_global;
+    }
+
+    // if present, title profile has precedence
+    if (fd_title >= 0) {
+        fd = fd_title;
+        if (fd_global >= 0) // global profile is not needed when both are present
+            ksceIoClose(fd_global);
+    }
+
+    psvs_oc_compat_profile_t oc;
+    int bytes = ksceIoRead(fd, &oc, sizeof(psvs_oc_compat_profile_t));
+    ksceIoClose(fd);
+
+    if (bytes != sizeof(psvs_oc_compat_profile_t))
+        return false;
+
+    if (strncmp(oc.ver, "PSVS0100", 8))
+        return false;
+
+    // convert to new format
+    psvs_oc_profile_t new_oc = {
+            .ver = PSVS_VERSION_VER,
+    };
+    for (int i = 0; i < PSVS_OC_DEVICE_VENEZIA; i++) {
+        new_oc.mode[i] = oc.mode[i];
+        new_oc.manual_freq[i] = oc.manual_freq[i];
+    }
+    new_oc.mode[PSVS_OC_DEVICE_VENEZIA] = PSVS_OC_MODE_DEFAULT;
+
+    psvs_oc_set_profile(&new_oc);
+    return true;
+}
+
+bool psvs_profile_load_new() {
     g_profile_exists = false;
     g_profile_exists_global = false;
 
@@ -53,11 +110,17 @@ bool psvs_profile_load() {
     if (bytes != sizeof(psvs_oc_profile_t))
         return false;
 
-    // todo: support old PSVS0100 profile
     if (strncmp(oc.ver, PSVS_VERSION_VER, 8))
         return false;
 
     psvs_oc_set_profile(&oc);
+    return true;
+}
+
+bool psvs_profile_load() {
+    if (!psvs_profile_load_new())
+        // if failed, try to load official psvs profile
+        return psvs_profile_load_compat();
     return true;
 }
 
