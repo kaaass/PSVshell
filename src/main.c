@@ -17,7 +17,7 @@ bool ksceAppMgrIsExclusiveProcessRunning();
 //bool ksceSblACMgrIsPspEmu(SceUID pid);
 //bool ksceSblACMgrIsSceShell(SceUID pid);
 
-#define PSVS_MAX_HOOKS 18
+#define PSVS_MAX_HOOKS 19
 static tai_hook_ref_t g_hookrefs[PSVS_MAX_HOOKS];
 static SceUID         g_hooks[PSVS_MAX_HOOKS];
 static SceUID         g_injects[1];
@@ -46,11 +46,13 @@ int (*_kscePowerGetArmClockFrequency)();
 int (*_kscePowerGetBusClockFrequency)();
 int (*_kscePowerGetGpuEs4ClockFrequency)(int *a1, int *a2);
 int (*_kscePowerGetGpuXbarClockFrequency)();
+int (*_kscePowerGetVeneziaClockFrequencyForDriver)();
 
 int (*_kscePowerSetArmClockFrequency)(int freq);
 int (*_kscePowerSetBusClockFrequency)(int freq);
 int (*_kscePowerSetGpuEs4ClockFrequency)(int a1, int a2);
 int (*_kscePowerSetGpuXbarClockFrequency)(int freq);
+int (*_kscePowerSetVeneziaClockFrequencyForDriver)(int freq);
 
 static void psvs_input_check(SceCtrlData *pad_data, int count) {
     // Do not pass input to fg app
@@ -158,6 +160,10 @@ int kscePowerSetGpuEs4ClockFrequency_patched(int a1, int a2) {
 
 int kscePowerSetGpuXbarClockFrequency_patched(int freq) {
     return TAI_CONTINUE(int, g_hookrefs[12], psvs_oc_get_target_freq(PSVS_OC_DEVICE_GPU_XBAR, freq));
+}
+
+int kscePowerSetVeneziaClockFrequencyForDriver_patched(int freq) {
+    return TAI_CONTINUE(int, g_hookrefs[18], psvs_oc_get_target_freq(PSVS_OC_DEVICE_VENEZIA, freq));
 }
 
 DECL_FUNC_HOOK_PATCH_FREQ_GETTER(14, scePowerGetArmClockFrequency,     PSVS_OC_DEVICE_CPU)
@@ -337,6 +343,8 @@ int module_start(SceSize argc, const void *args) {
             "ScePower", 0x1590166F, 0x475BCC82, (uintptr_t *)&_kscePowerGetGpuEs4ClockFrequency);
     module_get_export_func(KERNEL_PID,
             "ScePower", 0x1590166F, 0x0A750DEE, (uintptr_t *)&_kscePowerGetGpuXbarClockFrequency);
+    module_get_export_func(KERNEL_PID,
+            "ScePower", 0x1590166F, 0x64641E6A, (uintptr_t *)&_kscePowerGetVeneziaClockFrequencyForDriver);
 
     module_get_export_func(KERNEL_PID,
             "ScePower", 0x1590166F, 0x74DB5AE5, (uintptr_t *)&_kscePowerSetArmClockFrequency);
@@ -346,6 +354,8 @@ int module_start(SceSize argc, const void *args) {
             "ScePower", 0x1590166F, 0x264C24FC, (uintptr_t *)&_kscePowerSetGpuEs4ClockFrequency);
     module_get_export_func(KERNEL_PID,
             "ScePower", 0x1590166F, 0xA7739DBE, (uintptr_t *)&_kscePowerSetGpuXbarClockFrequency);
+    module_get_export_func(KERNEL_PID,
+            "ScePower", 0x1590166F, 0x621BD8FD, (uintptr_t *)&_kscePowerSetVeneziaClockFrequencyForDriver);
 
     g_mutex_cpufreq_uid = ksceKernelCreateMutex("psvs_mutex_cpufreq", 0, 0, NULL);
     g_mutex_procevent_uid = ksceKernelCreateMutex("psvs_mutex_procevent", 0, 0, NULL);
@@ -381,6 +391,8 @@ int module_start(SceSize argc, const void *args) {
             "ScePower", 0x1590166F, 0x264C24FC, kscePowerSetGpuEs4ClockFrequency_patched);
     g_hooks[12] = taiHookFunctionExportForKernel(KERNEL_PID, &g_hookrefs[12],
             "ScePower", 0x1590166F, 0xA7739DBE, kscePowerSetGpuXbarClockFrequency_patched);
+    g_hooks[18] = taiHookFunctionExportForKernel(KERNEL_PID, &g_hookrefs[18],
+            "ScePower", 0x1590166F, 0x621BD8FD, kscePowerSetVeneziaClockFrequencyForDriver_patched);
 
     g_hooks[13] = taiHookFunctionImportForKernel(KERNEL_PID, &g_hookrefs[13],
             "SceProcessmgr", 0x887F19D0, 0x414CC813, ksceKernelInvokeProcEventHandler_patched);

@@ -20,9 +20,11 @@ static int __kscePowerSetGpuEs4ClockFrequency(int freq) {
 PSVS_OC_DECL_GETTER(_kscePowerGetArmClockFrequency);
 PSVS_OC_DECL_GETTER(_kscePowerGetBusClockFrequency);
 PSVS_OC_DECL_GETTER(_kscePowerGetGpuXbarClockFrequency);
+PSVS_OC_DECL_GETTER(_kscePowerGetVeneziaClockFrequencyForDriver);
 PSVS_OC_DECL_SETTER(_kscePowerSetArmClockFrequency);
 PSVS_OC_DECL_SETTER(_kscePowerSetBusClockFrequency);
 PSVS_OC_DECL_SETTER(_kscePowerSetGpuXbarClockFrequency);
+PSVS_OC_DECL_SETTER(_kscePowerSetVeneziaClockFrequencyForDriver);
 
 static psvs_oc_devopt_t g_oc_devopt[PSVS_OC_DEVICE_MAX] = {
     [PSVS_OC_DEVICE_CPU] = {
@@ -44,6 +46,11 @@ static psvs_oc_devopt_t g_oc_devopt[PSVS_OC_DEVICE_MAX] = {
         .freq_n = 3, .freq = {83, 111, 166}, .default_freq = 111,
         .get_freq = __kscePowerGetGpuXbarClockFrequency,
         .set_freq = __kscePowerSetGpuXbarClockFrequency
+    },
+    [PSVS_OC_DEVICE_VENEZIA] = {
+        .freq_n = 4, .freq = {111, 166, 222, 333}, .default_freq = 166,
+        .get_freq = __kscePowerGetVeneziaClockFrequencyForDriver,
+        .set_freq = __kscePowerSetVeneziaClockFrequencyForDriver
     },
 };
 

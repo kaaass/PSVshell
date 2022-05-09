@@ -13,6 +13,7 @@ typedef enum {
     PSVS_OC_DEVICE_GPU_ES4,
     PSVS_OC_DEVICE_BUS,
     PSVS_OC_DEVICE_GPU_XBAR,
+    PSVS_OC_DEVICE_VENEZIA,
     PSVS_OC_DEVICE_MAX
 } psvs_oc_device_t;
 

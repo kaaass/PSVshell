@@ -53,6 +53,7 @@ bool psvs_profile_load() {
     if (bytes != sizeof(psvs_oc_profile_t))
         return false;
 
+    // todo: support old PSVS0100 profile
     if (strncmp(oc.ver, PSVS_VERSION_VER, 8))
         return false;
 
