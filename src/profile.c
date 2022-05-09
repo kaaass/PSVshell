@@ -7,14 +7,14 @@
 #include "main.h"
 #include "oc.h"
 
-#define PSVS_PROFILES_DIR "ur0:data/PSVshell/profiles/"
+#define PSVS_PROFILES_DIR "ur0:data/PSVshell_fork/profiles/"
 
 static bool g_profile_exists = false;
 static bool g_profile_exists_global = false;
 
 void psvs_profile_init() {
     ksceIoMkdir("ur0:data/", 0777);
-    ksceIoMkdir("ur0:data/PSVshell/", 0777);
+    ksceIoMkdir("ur0:data/PSVshell_fork/", 0777);
     ksceIoMkdir(PSVS_PROFILES_DIR, 0777);
 }
 
