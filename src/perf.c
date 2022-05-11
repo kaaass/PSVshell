@@ -25,9 +25,6 @@ static SceKernelSysClock g_perf_idle_clock_q_last[4] = {0, 0, 0, 0};
 static psvs_memory_t g_perf_memusage = {0};
 static psvs_battery_t g_perf_batt = {0};
 
-#define PSVS_PERF_FPS_SAMPLES 5
-static uint32_t g_perf_frametime_sum = 0;
-static uint8_t g_perf_frametime_n = 0;
 static int g_perf_fps = 0;
 
 int psvs_perf_get_fps() {
@@ -53,21 +50,18 @@ psvs_memory_t *psvs_perf_get_memusage() {
     return &g_perf_memusage;
 }
 
+long curTime = 0, lateTime = 0, fps_count = 0;
+
+// LoliCON's FPS counter, just for test
+// This function is from VitaJelly by DrakonPL and Rinne's framecounter
 void psvs_perf_calc_fps() {
-    SceUInt32 tick_now = ksceKernelGetProcessTimeLowCore();
-    uint32_t frametime = tick_now - g_perf_tick_fps_last;
-
-    // Update FPS when enough samples are collected
-    if (g_perf_frametime_n > PSVS_PERF_FPS_SAMPLES) {
-        uint32_t frametime_avg = g_perf_frametime_sum / g_perf_frametime_n;
-        g_perf_fps = (SECOND + (frametime_avg / 2) + 1) / frametime_avg;
-        g_perf_frametime_n = 0;
-        g_perf_frametime_sum = 0;
+    curTime = ksceKernelGetProcessTimeLowCore();
+    fps_count++;
+    if ((curTime - lateTime) > SECOND) {
+        lateTime = curTime;
+        g_perf_fps = (int)fps_count;
+        fps_count = 0;
     }
-
-    g_perf_frametime_n++;
-    g_perf_frametime_sum += frametime;
-    g_perf_tick_fps_last = tick_now;
 }
 
 void psvs_perf_poll_cpu() {
