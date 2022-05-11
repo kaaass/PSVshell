@@ -48,7 +48,7 @@ static psvs_oc_devopt_t g_oc_devopt[PSVS_OC_DEVICE_MAX] = {
         .set_freq = __kscePowerSetGpuXbarClockFrequency
     },
     [PSVS_OC_DEVICE_VENEZIA] = {
-        .freq_n = 4, .freq = {111, 166, 222, 333}, .default_freq = 166,
+        .freq_n = 7, .freq = {41, 55, 83, 111, 166, 222, 333}, .default_freq = 166,
         .get_freq = __kscePowerGetVeneziaClockFrequencyForDriver,
         .set_freq = __kscePowerSetVeneziaClockFrequencyForDriver
     },
