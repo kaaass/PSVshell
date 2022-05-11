@@ -44,6 +44,8 @@ typedef enum {
     PSVS_GUI_MODE_HIDDEN,
     PSVS_GUI_MODE_FULL,
     PSVS_GUI_MODE_FPS,
+    PSVS_GUI_MODE_FPS_BATTERY,
+    PSVS_GUI_MODE_BATTERY,
     PSVS_GUI_MODE_OSD,
     PSVS_GUI_MODE_MAX
 } psvs_gui_mode_t;
@@ -72,6 +74,7 @@ void psvs_gui_set_text_color2(rgba_t color);
 void psvs_gui_set_text_scale(float scale);
 
 void psvs_gui_dd_fps();
+void psvs_gui_dd_battery();
 
 void psvs_gui_clear();
 void psvs_gui_print(int x, int y, const char *str);

@@ -247,6 +247,22 @@ void psvs_gui_dd_fps() {
     DACR_RESET(dacr);
 }
 
+void psvs_gui_dd_battery() {
+    char buf[6] = "";
+    snprintf(buf, 6, "%d%%", psvs_perf_get_batt()->percent);
+    size_t len = strlen(buf);
+
+    uint32_t dacr;
+    DACR_UNRESTRICT(dacr);
+
+    for (int i = 1; i <= len; i++) {
+        _psvs_gui_dd_prchar(buf[len - i],
+                            g_gui_fb.width - 10 - i * g_gui_font_width * g_gui_font_scale, 10);
+    }
+
+    DACR_RESET(dacr);
+}
+
 void psvs_gui_clear() {
     for (int i = 0; i < GUI_WIDTH * GUI_HEIGHT; i++)
         g_gui_buffer[i] = g_gui_color_bg;

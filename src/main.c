@@ -97,8 +97,12 @@ int ksceDisplaySetFrameBufInternal_patched(int head, int index, const SceDisplay
 
     psvs_gui_set_framebuf(pParam);
 
-    if (mode == PSVS_GUI_MODE_FPS || mode == PSVS_GUI_MODE_FULL) {
+    if (mode == PSVS_GUI_MODE_FPS || mode == PSVS_GUI_MODE_FULL || mode == PSVS_GUI_MODE_FPS_BATTERY) {
         psvs_gui_dd_fps(); // draw fps onto fb
+    }
+
+    if (mode == PSVS_GUI_MODE_BATTERY || mode == PSVS_GUI_MODE_FULL || mode == PSVS_GUI_MODE_FPS_BATTERY) {
+        psvs_gui_dd_battery(); // draw battery onto fb
     }
 
     if (mode == PSVS_GUI_MODE_OSD || mode == PSVS_GUI_MODE_FULL) {
