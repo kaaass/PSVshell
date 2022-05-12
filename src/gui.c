@@ -15,6 +15,9 @@
 #include "oc.h"
 #include "profile.h"
 
+// allow both cross and circle button to confirm
+#define BTN_CONFIRM (SCE_CTRL_CROSS | SCE_CTRL_CIRCLE)
+
 int vsnprintf(char *s, size_t n, const char *format, va_list arg);
 
 static SceDisplayFrameBuf g_gui_fb = {
@@ -97,7 +100,7 @@ void psvs_gui_input_check(uint32_t buttons) {
 
         // Profile label
         if (g_gui_menu_control == PSVS_GUI_MENUCTRL_PROFILE) {
-            if (buttons_new & SCE_CTRL_CROSS) {
+            if (buttons_new & BTN_CONFIRM) {
                 bool global = buttons & GUI_GLOBAL_PROFILE_BUTTON_MOD;
                 if ((!global && psvs_oc_has_changed()) || !psvs_profile_exists(global)) {
                     psvs_profile_save(global);
@@ -119,13 +122,13 @@ void psvs_gui_input_check(uint32_t buttons) {
                     psvs_oc_change_manual(device, false);
                 }
                 // Back to default
-                else if (buttons_new & SCE_CTRL_CROSS) {
+                else if (buttons_new & BTN_CONFIRM) {
                     psvs_oc_set_mode(device, PSVS_OC_MODE_DEFAULT);
                 }
             }
             // In default freq mode
             else {
-                if (buttons_new & SCE_CTRL_CROSS) {
+                if (buttons_new & BTN_CONFIRM) {
                     psvs_oc_reset_manual(device);
                     psvs_oc_set_mode(device, PSVS_OC_MODE_MANUAL);
                 }
